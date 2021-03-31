@@ -86,14 +86,8 @@ variable "github_token" {
 
 variable "aws_region" {
   type        = string
-  default     = ""
+  default     = "ca-central-1"
   description = "(Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
-variable "aws_account_id" {
-  type        = string
-  default     = ""
-  description = "(Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
 }
 
 variable "image_repo_name" {

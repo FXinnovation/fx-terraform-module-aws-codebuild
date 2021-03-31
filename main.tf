@@ -224,14 +224,14 @@ data "aws_iam_policy_document" "vpc_permissions" {
     ]
 
     resources = [
-      "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*"
+      "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:network-interface/*"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "ec2:Subnet"
       values = formatlist(
-        "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/%s",
+        "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:subnet/%s",
         var.vpc_config.subnets
       )
     }
@@ -355,7 +355,7 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id
+      value = data.aws_caller_identity.default.account_id
     }
 
     dynamic "environment_variable" {

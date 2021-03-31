@@ -13,6 +13,7 @@
 | Name | Version |
 |------|---------|
 | terraform | >= 0.0 |
+| aws | ~> 2 |
 
 ## Providers
 
