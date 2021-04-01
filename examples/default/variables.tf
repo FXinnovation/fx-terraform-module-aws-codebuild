@@ -33,3 +33,13 @@ variable "cache_type" {
   type        = string
   description = "The type of storage that will be used for the AWS CodeBuild project cache. Valid values: NO_CACHE, LOCAL, and S3.  Defaults to NO_CACHE.  If cache_type is S3, it will create an S3 bucket for storing codebuild cache inside"
 }
+
+variable "access_key" {
+  description = "Credentials: AWS access key."
+  type        = string
+}
+
+variable "secret_key" {
+  description = "Credentials: AWS secret key. Pass this as a variable, never write password in the code."
+  type        = string
+}

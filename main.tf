@@ -3,7 +3,7 @@
 #####
 
 locals {
-  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = var.cache_bucket_name
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
   cache_bucket_name_normalised = substr(
@@ -29,8 +29,6 @@ locals {
   # Final Map Selected from above
   cache = local.cache_options[var.cache_type]
   labels = {
-    version    = var.image_version
-    part-of    = "shared-services"
     managed-by = "terraform"
     name       = "registry-sync"
   }

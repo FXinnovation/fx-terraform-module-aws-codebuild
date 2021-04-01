@@ -246,6 +246,12 @@ variable "versioning_enabled" {
 
 variable "access_log_bucket_name" {
   type        = string
-  default     = ""
+  default     = "codebuild-log-bucket"
   description = "Name of the S3 bucket where s3 access log will be sent to"
+}
+
+variable "cache_bucket_name" {
+  type        = string
+  default     = "codebuild-cache-bucket"
+  description = "Name of the S3 bucket where s3 is used for cache"
 }
