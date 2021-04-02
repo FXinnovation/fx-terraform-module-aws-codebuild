@@ -47,7 +47,10 @@ resource "aws_s3_bucket" "cache_bucket" {
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
-  tags          = module.this.tags
+  tags = merge(
+    var.tags,
+    local.tags,
+  )
 
   versioning {
     enabled = var.versioning_enabled
@@ -57,7 +60,7 @@ resource "aws_s3_bucket" "cache_bucket" {
     for_each = var.access_log_bucket_name != "" ? [1] : []
     content {
       target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
+      target_prefix = "logs/${var.logging_prefix}/"
     }
   }
 
@@ -66,7 +69,10 @@ resource "aws_s3_bucket" "cache_bucket" {
     enabled = true
 
     prefix = "/"
-    tags   = module.this.tags
+    tags = merge(
+      var.tags,
+      local.tags,
+    )
 
     expiration {
       days = var.cache_expiration_days
@@ -103,171 +109,27 @@ resource "random_string" "bucket_prefix" {
 ####
 
 resource "aws_iam_role" "default" {
-  name                  = module.this.id
+  name                  = "code-build"
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
-  tags                  = module.this.tags
+  tags = merge(
+    var.tags,
+    local.tags,
+  )
 }
 
-data "aws_iam_policy_document" "role" {
-  statement {
-    sid = ""
-
-    actions = [
-      "sts:AssumeRole",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["codebuild.amazonaws.com"]
-    }
-
-    effect = "Allow"
-  }
-}
 
 resource "aws_iam_policy" "default" {
-  name   = module.this.id
+  name   = var.codebuild_iam_policy_name
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.combined_permissions.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
   count  = local.s3_cache_enabled ? 1 : 0
-  name   = "${module.this.id}-cache-bucket"
+  name   = "default-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
-}
-
-data "aws_s3_bucket" "secondary_artifact" {
-  count  = (var.secondary_artifact_location != null ? 1 : 0)
-  bucket = var.secondary_artifact_location
-}
-
-data "aws_iam_policy_document" "permissions" {
-  statement {
-    sid = ""
-
-    actions = compact(concat([
-      "codecommit:GitPull",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:CompleteLayerUpload",
-      "ecr:GetAuthorizationToken",
-      "ecr:InitiateLayerUpload",
-      "ecr:PutImage",
-      "ecr:UploadLayerPart",
-      "ecs:RunTask",
-      "iam:PassRole",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "ssm:GetParameters",
-      "secretsmanager:GetSecretValue",
-    ], var.extra_permissions))
-
-    effect = "Allow"
-
-    resources = [
-      "*",
-    ]
-  }
-
-  dynamic "statement" {
-    for_each = var.secondary_artifact_location != null ? [1] : []
-    content {
-      sid = ""
-
-      actions = [
-        "s3:PutObject",
-        "s3:GetBucketAcl",
-        "s3:GetBucketLocation"
-      ]
-
-      effect = "Allow"
-
-      resources = [
-        join("", data.aws_s3_bucket.secondary_artifact.*.arn),
-        "${join("", data.aws_s3_bucket.secondary_artifact.*.arn)}/*",
-      ]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "vpc_permissions" {
-  count = var.vpc_config != {} ? 1 : 0
-
-  statement {
-    sid = ""
-
-    actions = [
-      "ec2:CreateNetworkInterface",
-      "ec2:DescribeDhcpOptions",
-      "ec2:DescribeNetworkInterfaces",
-      "ec2:DeleteNetworkInterface",
-      "ec2:DescribeSubnets",
-      "ec2:DescribeSecurityGroups",
-      "ec2:DescribeVpcs"
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    sid = ""
-
-    actions = [
-      "ec2:CreateNetworkInterfacePermission"
-    ]
-
-    resources = [
-      "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:network-interface/*"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:Subnet"
-      values = formatlist(
-        "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:subnet/%s",
-        var.vpc_config.subnets
-      )
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:AuthorizedService"
-      values = [
-        "codebuild.amazonaws.com"
-      ]
-    }
-
-  }
-}
-
-data "aws_iam_policy_document" "combined_permissions" {
-  override_policy_documents = compact([
-    join("", data.aws_iam_policy_document.permissions.*.json),
-    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
-  ])
-}
-
-data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = local.s3_cache_enabled ? 1 : 0
-  statement {
-    sid = ""
-
-    actions = [
-      "s3:*",
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      join("", aws_s3_bucket.cache_bucket.*.arn),
-      "${join("", aws_s3_bucket.cache_bucket.*.arn)}/*",
-    ]
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
@@ -294,16 +156,15 @@ resource "aws_codebuild_source_credential" "authorization" {
 }
 
 resource "aws_codebuild_project" "default" {
-  name           = module.this.id
+  name           = var.codebuild_project_name
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
   source_version = var.source_version != "" ? var.source_version : null
-  tags = {
-    for name, value in module.this.tags :
-    name => value
-    if length(value) > 0
-  }
+  tags = merge(
+    var.tags,
+    local.tags,
+  )
 
   artifacts {
     type     = var.artifact_type

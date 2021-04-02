@@ -55,6 +55,8 @@ No Modules.
 | cache\_bucket\_suffix\_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value. It only works when cache\_type is 'S3 | `bool` | `true` | no |
 | cache\_expiration\_days | How many days should the build cache be kept. It only works when cache\_type is 'S3' | `number` | `7` | no |
 | cache\_type | The type of storage that will be used for the AWS CodeBuild project cache. Valid values: NO\_CACHE, LOCAL, and S3.  Defaults to NO\_CACHE.  If cache\_type is S3, it will create an S3 bucket for storing codebuild cache inside | `string` | `"NO_CACHE"` | no |
+| codebuild\_iam\_policy\_name | name fot the default Iam policy codebuild | `string` | `"codebuild"` | no |
+| codebuild\_project\_name | name fot the codebuild project | `string` | `"codebuild-project"` | no |
 | encryption\_enabled | When set to 'true' the resource will have AES256 encryption enabled by default | `bool` | `false` | no |
 | environment\_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
 | extra\_permissions | List of action strings which will be added to IAM service account permissions. | `list(any)` | `[]` | no |
@@ -64,6 +66,7 @@ No Modules.
 | image\_repo\_name | (Optional) ECR repository name to store the Docker image built by this module. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | `string` | `"UNSET"` | no |
 | image\_tag | (Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | `string` | `"latest"` | no |
 | local\_cache\_modes | Specifies settings that AWS CodeBuild uses to store and reuse build dependencies. Valid values: LOCAL\_SOURCE\_CACHE, LOCAL\_DOCKER\_LAYER\_CACHE, and LOCAL\_CUSTOM\_CACHE | `list(string)` | `[]` | no |
+| logging\_prefix | Can be blank, but is the path to your logs in access bucket | `string` | `null` | no |
 | logs\_config | Configuration for the builds to store log data to CloudWatch or S3. | `any` | `{}` | no |
 | private\_repository | Set to true to login into private repository with credentials supplied in source\_credential variable. | `bool` | `false` | no |
 | privileged\_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | `bool` | `false` | no |
@@ -79,6 +82,7 @@ No Modules.
 | source\_location | The location of the source code from git or s3 | `string` | `""` | no |
 | source\_type | The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB\_ENTERPRISE, BITBUCKET or S3 | `string` | `"CODEPIPELINE"` | no |
 | source\_version | A version of the build input to be built for this project. If not specified, the latest version is used. | `string` | `""` | no |
+| tags | Tags to be merged with all resources of this module. | `map(string)` | `{}` | no |
 | versioning\_enabled | A state of versioning. Versioning is a means of keeping multiple variants of an object in the same bucket | `bool` | `true` | no |
 | vpc\_config | Configuration for the builds to run inside a VPC. | `any` | `{}` | no |
 

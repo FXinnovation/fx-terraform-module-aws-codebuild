@@ -255,3 +255,27 @@ variable "cache_bucket_name" {
   default     = "codebuild-cache-bucket"
   description = "Name of the S3 bucket where s3 is used for cache"
 }
+
+variable "tags" {
+  description = "Tags to be merged with all resources of this module."
+  type        = map(string)
+  default     = {}
+}
+
+variable "logging_prefix" {
+  description = "Can be blank, but is the path to your logs in access bucket"
+  type        = string
+  default     = null
+}
+
+variable "codebuild_iam_policy_name" {
+  description = "name fot the default Iam policy codebuild"
+  type        = string
+  default     = "codebuild"
+}
+
+variable "codebuild_project_name" {
+  description = "name fot the codebuild project"
+  type        = string
+  default     = "codebuild-project"
+}
