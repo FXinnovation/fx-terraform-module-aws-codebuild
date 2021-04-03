@@ -32,6 +32,10 @@ locals {
     managed-by = "terraform"
     name       = "registry-sync"
   }
+  tags = {
+    managed-by = "terraform"
+    name       = "registry-sync"
+  }
   annotations = {}
 }
 
