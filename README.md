@@ -7,7 +7,7 @@ Template repository for public terraform modules
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13.0 |
+| terraform | >= 0.12.0 |
 | aws | >= 2.0 |
 | random | >= 2.1 |
 
