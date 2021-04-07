@@ -6,12 +6,6 @@ provider "aws" {
 }
 
 module "codebuild" {
-  source = "../../"
-
+  source                      = "../../"
   cache_bucket_suffix_enabled = false
-
-  cache_expiration_days = 7
-
-  cache_type = "S3"
-
 }
