@@ -127,10 +127,9 @@ data "aws_iam_policy_document" "vpc_permissions" {
 }
 
 data "aws_iam_policy_document" "combined_permissions" {
-  override_policy_documents = compact([
+  override_policy_documents = [
     join("", data.aws_iam_policy_document.permissions.*.json),
-    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
-  ])
+  ]
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
