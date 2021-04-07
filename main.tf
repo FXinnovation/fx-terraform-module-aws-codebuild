@@ -210,10 +210,6 @@ resource "aws_codebuild_project" "code_build_default" {
     image           = var.build_image
     type            = var.build_type
     privileged_mode = var.privileged_mode
-    environment_variable {
-      name  = "AWS_ACCOUNT_ID"
-      value = data.aws_caller_identity.current.account_id
-    }
 
     dynamic "environment_variable" {
       for_each = var.environment_variables
