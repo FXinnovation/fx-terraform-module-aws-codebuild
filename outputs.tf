@@ -1,21 +1,21 @@
 output "project_name" {
   description = "Project name"
-  value       = join("", aws_codebuild_project.default.*.name)
+  value       = join("", aws_codebuild_project.code_build_default.*.name)
 }
 
 output "project_id" {
   description = "Project ID"
-  value       = join("", aws_codebuild_project.default.*.id)
+  value       = join("", aws_codebuild_project.code_build_default.*.id)
 }
 
 output "role_id" {
   description = "IAM Role ID"
-  value       = join("", aws_iam_role.default.*.id)
+  value       = join("", aws_iam_role.code_build_default.*.id)
 }
 
 output "role_arn" {
   description = "IAM Role ARN"
-  value       = join("", aws_iam_role.default.*.arn)
+  value       = join("", aws_iam_role.code_build_default.*.arn)
 }
 
 output "cache_bucket_name" {
@@ -30,10 +30,10 @@ output "cache_bucket_arn" {
 
 output "badge_url" {
   description = "The URL of the build badge when badge_enabled is enabled"
-  value       = join("", aws_codebuild_project.default.*.badge_url)
+  value       = join("", aws_codebuild_project.code_build_default.*.badge_url)
 }
 
 output "project_arn" {
   description = "Project ARN"
-  value       = join("", aws_codebuild_project.default.*.arn)
+  value       = join("", aws_codebuild_project.code_build_default.*.arn)
 }
