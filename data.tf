@@ -126,12 +126,6 @@ data "aws_iam_policy_document" "vpc_permissions" {
   }
 }
 
-data "aws_iam_policy_document" "combined_permissions" {
-  override_policy_documents = [
-    join("", data.aws_iam_policy_document.permissions.*.json),
-  ]
-}
-
 data "aws_iam_policy_document" "permissions_cache_bucket" {
   count = local.s3_cache_enabled ? 1 : 0
   statement {

@@ -126,7 +126,7 @@ resource "aws_iam_role" "default" {
 resource "aws_iam_policy" "default" {
   name   = var.codebuild_iam_policy_name
   path   = "/service-role/"
-  policy = data.aws_iam_policy_document.combined_permissions.json
+  policy = data.aws_iam_policy_document.permissions.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
