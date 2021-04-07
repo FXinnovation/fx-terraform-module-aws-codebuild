@@ -33,8 +33,8 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| access\_key | Credentials: AWS access key. | `string` | `""` | no |
-| secret\_key | Credentials: AWS secret key. Pass this as a variable, never write password in the code. | `string` | `""` | no |
+| access\_key | Credentials: AWS access key. | `string` | `null` | no |
+| secret\_key | Credentials: AWS secret key. Pass this as a variable, never write password in the code. | `string` | `null` | no |
 
 ## Outputs
 
