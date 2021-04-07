@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {
+}
+
 #####
 # code build Role
 data "aws_iam_policy_document" "role" {
