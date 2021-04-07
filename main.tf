@@ -112,7 +112,7 @@ resource "random_string" "bucket_prefix" {
 # IamRoles
 ####
 
-resource "aws_iam_role" "default" {
+resource "aws_iam_role" "code_build_default" {
   name                  = "code-build"
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
@@ -123,7 +123,7 @@ resource "aws_iam_role" "default" {
 }
 
 
-resource "aws_iam_policy" "default" {
+resource "aws_iam_policy" "code_build_default" {
   name   = var.codebuild_iam_policy_name
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.permissions.json
@@ -136,15 +136,15 @@ resource "aws_iam_policy" "default_cache_bucket" {
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
-resource "aws_iam_role_policy_attachment" "default" {
-  policy_arn = join("", aws_iam_policy.default.*.arn)
-  role       = join("", aws_iam_role.default.*.id)
+resource "aws_iam_role_policy_attachment" "code_build_default" {
+  policy_arn = join("", aws_iam_policy.code_build_default.*.arn)
+  role       = join("", aws_iam_role.code_build_default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = local.s3_cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
-  role       = join("", aws_iam_role.default.*.id)
+  role       = join("", aws_iam_role.code_build_default.*.id)
 }
 
 #####
@@ -159,9 +159,9 @@ resource "aws_codebuild_source_credential" "authorization" {
   user_name   = var.source_credential_user_name
 }
 
-resource "aws_codebuild_project" "default" {
+resource "aws_codebuild_project" "code_build_default" {
   name           = var.codebuild_project_name
-  service_role   = join("", aws_iam_role.default.*.arn)
+  service_role   = join("", aws_iam_role.code_build_default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
   source_version = var.source_version != "" ? var.source_version : null
